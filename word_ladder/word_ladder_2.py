@@ -1,8 +1,16 @@
+class Node(object):
+
+    def __init__(self, word, children):
+        self.word = word
+        self.children = children
+        self.parent = None
+
+    def __str__(self):
+        return '{} -> {}'.format(self.word, [n.word for n in self.children])
+
 def buildGraphHash(beginWord, wordList, resHash={}):
     if beginWord in resHash:
         return resHash
-
-    node = Node(beginWord, set())
 
     kiddos = set([otherword for otherword in wordList if otherword != beginWord
                 and wordDist(beginWord, otherword) == 1])
@@ -38,8 +46,37 @@ class Solution(object):
 
         min_length = float('inf')
         paths = []
+
         while stack:
             node, current_path = stack.pop()
+
+            if len(current_path) > min_length:
+                continue
+
+            eligible_kiddos = [k for k in graph[node] if k not in current_path]
+
+            for kiddo in eligible_kiddos:
+                if kiddo == end:
+                    current_path.append(kiddo)
+                    if len(current_path) < min_length:
+                        min_length = len(current_path)
+
+                    paths.append(current_path)
+                else:
+                    kiddo_path = current_path + [kiddo]
+                    print kiddo_path
+                    stack.append((kiddo, kiddo_path))
+
+        return [p for p in paths if len(p) == min_length]
+
+    def bfs(self, graph, start, end):
+        path = [start]
+        stack = [(start, path)]
+
+        min_length = float('inf')
+        paths = []
+        while stack:
+            node, current_path = stack.pop(0)
 
             if len(current_path) > min_length:
                 continue
